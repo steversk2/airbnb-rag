@@ -31,7 +31,7 @@ Budget: **under $50/month** — the GPU instance is stopped between sessions
   Verify: `kubectl get nodes -o json | grep nvidia.com/gpu` should show `1`.
 - Allocate an **Elastic IP** and associate it with the instance (survives
   stop/start; free while attached).
-- Security group inbound: **80** and **443** from `0.0.0.0/0` (+ 22 for SSH).
+- Security group inbound: **80** and **443** from `0.0.0.0/0` 
 - DNS: A record (e.g. `concierge`) → the Elastic IP.
 
 ## 2. vLLM (the AI brain)
