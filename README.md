@@ -127,8 +127,6 @@ Guest link: `https://<your-host>/?key=<guest-key>`
 
 ## Operational notes
 
-- **Port-forwards die** when the terminal/SSH session ends — use `nohup`.
-- After a `rollout restart`, re-attach port-forwards (they pin to the old pod).
 - **Stop the instance after each session** (EC2 console → Stop). EBS keeps
   everything; GPU billing stops.
 - Watch node disk (`df -h /`): torch-based images are large; prune with
