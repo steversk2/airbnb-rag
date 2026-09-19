@@ -1,0 +1,50 @@
+# Guest-key secret. Generate a fresh key per deployment - NEVER commit a real key.
+#   openssl rand -hex 16
+apiVersion: v1
+kind: Secret
+metadata:
+  name: concierge-key
+stringData:
+  guest-key: REPLACE-ME
+---
+# Retrieval API + web chat.
+# Image is built locally (api/Dockerfile) and imported into k3s containerd:
+#   docker build -t concierge-api:latest ./api
+#   docker save concierge-api:latest | sudo k3s ctr -n k8s.io images import -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: concierge-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: concierge-api
+  template:
+    metadata:
+      labels:
+        app: concierge-api
+    spec:
+      containers:
+      - name: api
+        image: concierge-api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: GUEST_KEY
+          valueFrom:
+            secretKeyRef:
+              name: concierge-key
+              key: guest-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: concierge-api
+spec:
+  selector:
+    app: concierge-api
+  ports:
+  - port: 8080
+    targetPort: 8080

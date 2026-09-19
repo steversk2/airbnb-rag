@@ -1,0 +1,48 @@
+# Qdrant vector database with persistent storage.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qdrant-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qdrant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qdrant
+  template:
+    metadata:
+      labels:
+        app: qdrant
+    spec:
+      containers:
+      - name: qdrant
+        image: qdrant/qdrant:v1.19.1
+        ports:
+        - containerPort: 6333
+        volumeMounts:
+        - name: data
+          mountPath: /qdrant/storage
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: qdrant-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qdrant
+spec:
+  selector:
+    app: qdrant
+  ports:
+  - port: 6333
+    targetPort: 6333
